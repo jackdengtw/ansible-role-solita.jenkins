@@ -9,3 +9,6 @@ solita_jenkins_restart: yes
 solita_jenkins_credentials: {}
 solita_jenkins_absent_credentials: []
 solita_jenkins_password_dir: "{{ inventory_dir | default('.') }}/solita_jenkins_default_password"
+solita_admin_email: who@nobody.com
+solita_jenkins_url: http://jenkins_url_not_set.com:8080
+solita_jenkins_num_executors: 0

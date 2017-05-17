@@ -42,3 +42,23 @@
 
 - include: jobs.yml
   tags: solita_jenkins_jobs
+
+- name: Set Jenkins Location and admin email
+  become: yes
+  template:
+    src: solita_jenkins.model.JenkinsLocationConfiguration.xml.j2
+    dest: /var/lib/jenkins/jenkins.model.JenkinsLocationConfiguration.xml
+    owner: jenkins
+    group: jenkins
+    mode: 0644
+  register: location_and_mail
+
+- name: Set Executors number in jenkins master
+  become: yes
+  lineinfile:
+    dest: /var/lib/jenkins/config.xml
+    regexp: "^([^\\d]*)(\\d*)</numExecutors>"
+    line: "\\1{{ solita_jenkins_num_executors }}</numExecutors>"
+    backrefs: yes
+  register: set_executors_number
+
