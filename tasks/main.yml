@@ -58,7 +58,7 @@
   lineinfile:
     dest: /var/lib/jenkins/config.xml
     regexp: "^([^\\d]*)(\\d*)</numExecutors>"
-    line: "\\1{{ solita_jenkins_num_executors }}</numExecutors>"
+    line: '\g<1>{{ solita_jenkins_num_executors }}</numExecutors>' # note \1 won't work with number followed
     backrefs: yes
   register: set_executors_number
 
