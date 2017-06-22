@@ -2,63 +2,44 @@
 - include: security.yml
   tags: solita_jenkins_security
 
-- include: plugins.yml
-  tags: solita_jenkins_plugins
+# - include: plugins.yml
+#   tags: solita_jenkins_plugins
+# 
+# # Copy job-dsl-config.xml to server so we can use Jenkins CLI to create a new
+# # job from it.
+# - name: Copy job-dsl-config.xml to destination
+#   become: yes
+#   copy:
+#     src: job-dsl-config.xml
+#     dest: /var/lib/jenkins/job-dsl-config.xml
+#     owner: jenkins
+#     group: jenkins
+# 
+# - name: Create the job-dsl job
+#   shell: >
+#     {{ solita_jenkins_cli }} create-job job-dsl </var/lib/jenkins/job-dsl-config.xml
+#   args:
+#     creates: /var/lib/jenkins/jobs/job-dsl/config.xml
+#   register: create_job_dsl_job
+# 
+# # Overwrite the config.xml of an already-created job.
+# - name: Update the job-dsl job configuration
+#   become: yes
+#   copy:
+#     src: job-dsl-config.xml
+#     dest: /var/lib/jenkins/jobs/job-dsl/config.xml
+#     owner: jenkins
+#     group: jenkins
+#   register: update_job_dsl_job
+# 
+# - name: Reload the job-dsl job
+#   command: >
+#     {{ solita_jenkins_cli }} reload-job job-dsl
+#   when: update_job_dsl_job | changed
 
-# Copy job-dsl-config.xml to server so we can use Jenkins CLI to create a new
-# job from it.
-- name: Copy job-dsl-config.xml to destination
-  become: yes
-  copy:
-    src: job-dsl-config.xml
-    dest: /var/lib/jenkins/job-dsl-config.xml
-    owner: jenkins
-    group: jenkins
+# - include: credentials.yml
+#  tags: solita_jenkins_credentials
 
-- name: Create the job-dsl job
-  shell: >
-    {{ solita_jenkins_cli }} create-job job-dsl </var/lib/jenkins/job-dsl-config.xml
-  args:
-    creates: /var/lib/jenkins/jobs/job-dsl/config.xml
-  register: create_job_dsl_job
-
-# Overwrite the config.xml of an already-created job.
-- name: Update the job-dsl job configuration
-  become: yes
-  copy:
-    src: job-dsl-config.xml
-    dest: /var/lib/jenkins/jobs/job-dsl/config.xml
-    owner: jenkins
-    group: jenkins
-  register: update_job_dsl_job
-
-- name: Reload the job-dsl job
-  command: >
-    {{ solita_jenkins_cli }} reload-job job-dsl
-  when: update_job_dsl_job | changed
-
-- include: credentials.yml
-  tags: solita_jenkins_credentials
-
-- include: jobs.yml
-  tags: solita_jenkins_jobs
-
-- name: Set Jenkins Location and admin email
-  become: yes
-  template:
-    src: solita_jenkins.model.JenkinsLocationConfiguration.xml.j2
-    dest: /var/lib/jenkins/jenkins.model.JenkinsLocationConfiguration.xml
-    owner: jenkins
-    group: jenkins
-    mode: 0644
-  register: location_and_mail
-
-- name: Set Executors number in jenkins master
-  become: yes
-  lineinfile:
-    dest: /var/lib/jenkins/config.xml
-    regexp: "^([^\\d]*)(\\d*)</numExecutors>"
-    line: '\g<1>{{ solita_jenkins_num_executors }}</numExecutors>' # note \1 won't work with number followed
-    backrefs: yes
-  register: set_executors_number
+# - include: jobs.yml
+#  tags: solita_jenkins_jobs
 
