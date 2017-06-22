@@ -36,9 +36,28 @@ if (solita_jenkins_security_realm == 'jenkins') {
         Role adminRole = new Role("admin", permissions);
         strategy.addRole(RoleBasedAuthorizationStrategy.GLOBAL, adminRole);
         strategy.assignRole(RoleBasedAuthorizationStrategy.GLOBAL, adminRole, 'solita_jenkins');
-        strategy.assignRole(RoleBasedAuthorizationStrategy.GLOBAL, adminRole, "admin");
+        strategy.assignRole(RoleBasedAuthorizationStrategy.GLOBAL, adminRole, "admin"); // TODO: remove this later
+
         jenkins.setAuthorizationStrategy(strategy)
     }
+
+    def roleBasedAuthorizationStrategy = Jenkins.getInstance().getAuthorizationStrategy()
+
+    Map<String, RoleMap> roleMaps = roleBasedAuthorizationStrategy.getRoleMaps()
+    for(Map.Entry<String, RoleMap> roleMapEntry : roleMaps.entrySet()) {
+        if(roleMapEntry.getKey().equals(RoleBasedAuthorizationStrategy.GLOBAL)) {
+            if(!roleMapEntry.getValue().getRoles().collect { it.getName() }.contains('authenticated')) {
+                Set<Permission> authenticatedPerms = new HashSet<Permission>()
+                authenticatedPerms.add(Permission.fromId("hudson.model.Item.Read"))
+                authenticatedPerms.add(Permission.fromId("hudson.model.View.Read"))
+                authenticatedPerms.add(Permission.fromId("hudson.model.Hudson.Read"))
+                Role authenticatedRole = new Role("authenticated", authenticatedPerms);
+                roleBasedAuthorizationStrategy.addRole(RoleBasedAuthorizationStrategy.GLOBAL, authenticatedRole);
+                roleBasedAuthorizationStrategy.assignRole(RoleBasedAuthorizationStrategy.GLOBAL, authenticatedRole, 'authenticated');
+            }
+        }
+    }
+
 } else if (solita_jenkins_security_realm == 'none') {
     // If we leave the user, further attempts to use jenkins-cli.jar with
     // key-based authentication enabled fail for some reason. Clearing the
